@@ -7,7 +7,9 @@ import torch
 def get_args():
     parser = argparse.ArgumentParser(description='RL')
     parser.add_argument(
-        '--algo', default='ppo', help='algorithm to use: a2c | ppo | acktr')
+        '--algo',
+        default='ppo',
+        help='algorithm to use: a2c | ppo | acktr')
     parser.add_argument(
         '--gail',
         action='store_true',
@@ -101,7 +103,7 @@ def get_args():
     parser.add_argument(
         '--log-interval',
         type=int,
-        default=10,
+        default=100,
         help='log interval, one log per n updates (default: 10)')
     parser.add_argument(
         '--save-interval',
@@ -116,7 +118,7 @@ def get_args():
     parser.add_argument(
         '--eval-interval',
         type=int,
-        default=None,
+        default=50,
         help='eval interval, one eval per n updates (default: None)')
     parser.add_argument(
         '--num-env-steps',

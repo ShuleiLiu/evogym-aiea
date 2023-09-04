@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import csv
 from ppo import utils
 from ppo.envs import make_vec_envs
 
@@ -34,6 +35,8 @@ def evaluate(
         num_processes, actor_critic.recurrent_hidden_state_size, device=device)
     eval_masks = torch.zeros(num_processes, 1, device=device)
 
+    all_action = []
+
     while len(eval_episode_rewards) < num_evals:
         with torch.no_grad():
             _, action, _, eval_recurrent_hidden_states = actor_critic.act(
@@ -55,5 +58,6 @@ def evaluate(
                 eval_episode_rewards.append(info['episode']['r'])
 
     eval_envs.close()
+
 
     return np.mean(eval_episode_rewards)

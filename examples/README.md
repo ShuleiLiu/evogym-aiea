@@ -41,7 +41,7 @@ To set the parameters of the genetic algorithm, you can edit `run_ga.py` and cha
 From within `example`, you can run the genetic algorithm with the following command:
 
 ```shell
-python run_ga.py --env-name "Walker-v0" --algo ppo --use-gae --lr 2.5e-4 --clip-param 0.1 --value-loss-coef 0.5 --num-processes 4 --num-steps 128 --num-mini-batch 4 --log-interval 100 --use-linear-lr-decay --entropy-coef 0.01 --eval-interval 50
+python run_vga.py --env-name "Walker-v0" --algo ppo --use-gae --lr 2.5e-4 --clip-param 0.1 --value-loss-coef 0.5 --num-processes 4 --num-steps 128 --num-mini-batch 4 --log-interval 100 --use-linear-lr-decay --entropy-coef 0.01 --eval-interval 50
 ```
 
 The environment name as well as all ppo hyperparameters are specified through command line arguments. For more details please see [this repo](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail).

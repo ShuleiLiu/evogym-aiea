@@ -24,17 +24,18 @@ import evogym.envs
 def run_ppo(
     structure, 
     termination_condition, 
-    saving_convention, 
+    saving_convention,
     override_env_name = None,
     verbose = True):
 
     assert (structure == None) == (termination_condition == None) and (structure == None) == (saving_convention == None)
 
-    print(f'Starting training on \n{structure}\nat {saving_convention}...\n')
+    # print(f'Starting training on \n{structure}\nat {saving_convention}...\n')
 
     args = get_args()
-    if override_env_name:
+    if override_env_name != None:
         args.env_name = override_env_name
+
 
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
@@ -55,6 +56,7 @@ def run_ppo(
 
     envs = make_vec_envs(args.env_name, structure, args.seed, args.num_processes,
                          args.gamma, args.log_dir, device, False)
+
 
     actor_critic = Policy(
         envs.observation_space.shape,
@@ -143,6 +145,11 @@ def run_ppo(
             # Obser reward and next obs
             obs, reward, done, infos = envs.step(action)
 
+            # print(np.array(action))
+
+            # if done == True:
+            #     print(saving_convention)
+
             # track rewards
             for info in infos:
                 if 'episode' in info.keys():
@@ -191,32 +198,32 @@ def run_ppo(
         rollouts.after_update()
      
         # print status
-        if j % args.log_interval == 0 and len(episode_rewards) > 1 and verbose:
-            total_num_steps = (j + 1) * args.num_processes * args.num_steps
-            end = time.time()
-            print(
-                "Updates {}, num timesteps {}, FPS {} \n Last {} training episodes: mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}\n"
-                    .format(j, total_num_steps,
-                            int(total_num_steps / (end - start)),
-                            len(episode_rewards), np.mean(episode_rewards),
-                            np.median(episode_rewards), np.min(episode_rewards),
-                            np.max(episode_rewards), dist_entropy, value_loss,
-                            action_loss))
+        # if j % args.log_interval == 0 and len(episode_rewards) > 1 and verbose:
+            # total_num_steps = (j + 1) * args.num_processes * args.num_steps
+            # end = time.time()
+            # print(
+            #     "Updates {}, num timesteps {}, FPS {} \n Last {} training episodes: mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}\n"
+            #         .format(j, total_num_steps,
+            #                 int(total_num_steps / (end - start)),
+            #                 len(episode_rewards), np.mean(episode_rewards),
+            #                 np.median(episode_rewards), np.min(episode_rewards),
+            #                 np.max(episode_rewards), dist_entropy, value_loss,
+            #                 action_loss))
         
         # evaluate the controller and save it if it does the best so far
         if (args.eval_interval is not None and len(episode_rewards) > 1
                 and j % args.eval_interval == 0):
-            
+
+            # 使用训练好的模型产生指令，仿真，获得最后的reward
             obs_rms = utils.get_vec_normalize(envs).obs_rms
             determ_avg_reward = evaluate(args.num_evals, actor_critic, obs_rms, args.env_name, structure, args.seed,
                      args.num_processes, eval_log_dir, device)
 
-            if verbose:
-                if saving_convention != None:
-                    print(f'Evaluated {saving_convention[1]} using {args.num_evals} episodes. Mean reward: {np.mean(determ_avg_reward)}\n')
-                else:
-                    print(f'Evaluated using {args.num_evals} episodes. Mean reward: {np.mean(determ_avg_reward)}\n')
-
+            # if verbose:
+            #     if saving_convention != None:
+            #         print(f'Evaluated {saving_convention[1]} using {args.num_evals} episodes. Mean reward: {np.mean(determ_avg_reward)}\n')
+            #     else:
+            #         print(f'Evaluated using {args.num_evals} episodes. Mean reward: {np.mean(determ_avg_reward)}\n')
             if determ_avg_reward > max_determ_avg_reward:
                 max_determ_avg_reward = determ_avg_reward
 
@@ -224,8 +231,8 @@ def run_ppo(
                 if saving_convention != None:
                     temp_path = os.path.join(saving_convention[0], "robot_" + str(saving_convention[1]) + "_controller" + ".pt")
                 
-                if verbose:
-                    print(f'Saving {temp_path} with avg reward {max_determ_avg_reward}\n')
+                # if verbose:
+                #     print(f'Saving {temp_path} with avg reward {max_determ_avg_reward}\n')
                 torch.save([
                     actor_critic,
                     getattr(utils.get_vec_normalize(envs), 'obs_rms', None)
@@ -234,8 +241,8 @@ def run_ppo(
         # return upon reaching the termination condition
         if not termination_condition == None:
             if termination_condition(j):
-                if verbose:
-                    print(f'{saving_convention} has met termination condition ({j})...terminating...\n')
+                # if verbose:
+                #     print(f'{saving_convention} has met termination condition ({j})...terminating...\n')
                 return max_determ_avg_reward
 
 #python ppo_main_test.py --env-name "roboticgamedesign-v0" --algo ppo --use-gae --lr 2.5e-4 --clip-param 0.1 --value-loss-coef 0.5 --num-processes 1 --num-steps 128 --num-mini-batch 4 --log-interval 1 --use-linear-lr-decay --entropy-coef 0.01

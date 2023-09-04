@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from os import name
 from evogym import is_connected, has_actuator, get_full_connectivity, draw, get_uniform
 
@@ -62,6 +63,38 @@ def mutate(child, mutation_rate=0.1, num_attempts=10):
 
     # no valid robot found after num_attempts
     return None
+
+## num_attempts，最大迭代次数
+def ls_mutate(child, mutation_rate=0.1, frquency = None):
+    pd = get_uniform(5)
+    pd[0] = 0.6  # it is 3X more likely for a cell to become empty
+
+    # for every cell there is mutation_rate% chance of mutation
+    for i in range(child.shape[0]):
+        for j in range(child.shape[1]):
+            if np.random.random() <= mutation_rate:  # mutation
+                if frquency == None:
+                    mutated_voxel = draw(pd)
+                else:
+                    pd = [i*5+j]
+                    mutated_voxel = draw(pd)
+                ## 如果变异的voxel为0，需要判断robot是否是联通的
+                if mutated_voxel == 0:
+                    child[i][j] = mutated_voxel
+                    if is_connected(child) == False:
+                        child[i][j] = np.random.randint(1, 5)
+                else:
+                    child[i][j] = mutated_voxel
+    ## 判断robot内是否有actor
+    actor_position = np.where(np.array(child) >= 3)
+    if len(actor_position[0]) == 0:
+        p1 = np.where(np.array(child) == 1)
+        p2 = np.where(np.array(child) == 2)
+        x_ax = list(p1[0]) + list(p2[0])
+        y_ax = list(p1[1]) + list(p2[1])
+        indx = np.random.randint(0, len(x_ax))
+        child[x_ax[indx]][y_ax[indx]] = np.random.randint(3, 5)
+    return child, get_full_connectivity(child)
 
 def get_percent_survival(gen, max_gen):
     low = 0.0
@@ -162,26 +195,131 @@ def total_robots_explored_breakpoints_evals(pop_size, max_evals):
 
     return out
 
-if __name__ == "__main__":
 
-    pop_size = 25
-    num_evals = pop_size
-    max_evals = 750
+def structure_to_genome(structure):
+    return [i for itm in structure for i in itm]
 
-    count = 1
-    print(num_evals, num_evals, count)
-    while num_evals < max_evals:
-        num_survivors = max(2,  math.ceil(pop_size*get_percent_survival_evals(num_evals, max_evals)))
-        new_robots = pop_size - num_survivors
-        num_evals += new_robots
-        count += 1
-        print(new_robots, num_evals, count)
 
-    print(total_robots_explored_breakpoints_evals(pop_size, max_evals))
-        
-    # target = search_max_gen_target(25, 500)
-    # print(target)
-    # print(total_robots_explored(25, target-1))
-    # print(total_robots_explored(25, target))
+def crossover(p1, p2, rate=0.2, num_attempts=20):
+    off = []
+    t1 = structure_to_genome(p1)
+    t2 = structure_to_genome(p2)
+    dim = len(t1)
+    cros_len = int(dim*rate)
+    for n in range(num_attempts):
+        ran_pos = np.random.randint(0, dim-cros_len)
+        for j in range(cros_len):
+            tmp = t1[ran_pos + j]
+            t1[ran_pos + j] = t2[ran_pos + j]
+            t2[ran_pos + j] = tmp
+        o1 = np.array(t1).reshape((5, 5))
+        o2 = np.array(t2).reshape((5, 5))
+        if is_connected(o1) and has_actuator(o1) and len(off) < 2:
+            off.append(o1)
+        if is_connected(o2) and has_actuator(o2) and len(off) < 2:
+            off.append(o2)
+        if len(off) >= 2:
+            break
+    return off
 
-    # print(total_robots_explored_breakpoints(25, target, 500))
+def get_par(env_name):
+    tc = 0
+    max_eva = 0
+    if env_name == 'Walker-v0':
+        tc = 500
+        max_eva = 100
+    elif env_name == 'BridgeWalker-v0':
+        tc = 500
+        max_eva = 100
+    elif env_name == 'BidirectionalWalker-v0':
+        tc = 1000
+        max_eva = 150
+    elif env_name == 'Carrier-v0':
+        tc = 500
+        max_eva = 100
+    elif env_name == 'Carrier-v1':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'Pusher-v0':
+        tc = 500
+        max_eva = 100
+    elif env_name == 'Pusher-v1':
+        tc = 600
+        max_eva = 150
+    elif env_name == 'Thrower-v0':
+        tc = 300
+        max_eva = 150
+    elif env_name == 'Catcher-v0':
+        tc = 400
+        max_eva = 200
+    elif env_name == 'BeamToppler-v0':
+        tc = 1000
+        max_eva = 100
+    elif env_name == 'BeamSlider-v0':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'Lifter-v0':
+        tc = 300
+        max_eva = 200
+    elif env_name == 'Climber-v0':
+        tc = 400
+        max_eva = 150
+    elif env_name == 'Climber-v1':
+        tc = 600
+        max_eva = 150
+    elif env_name == 'Climber-v2':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'UpStepper-v0':
+        tc = 600
+        max_eva = 150
+    elif env_name == 'DownStepper-v0':
+        tc = 500
+        max_eva = 100
+    elif env_name == 'ObstacleTraverser-v0':
+        tc = 1000
+        max_eva = 150
+    elif env_name == 'ObstacleTraverser-v1':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'Hurdler-v0':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'PlatformJumper-v0':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'GapJumper-v0':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'Traverser-v0':
+        tc = 1000
+        max_eva = 200
+    elif env_name == 'CaveCrawler-v0':
+        tc = 1000
+        max_eva = 150
+    elif env_name == 'AreaMaximizer-v0':
+        tc = 600
+        max_eva = 100
+    elif env_name == 'AreaMinimizer-v0':
+        tc = 600
+        max_eva = 150
+    elif env_name == 'WingspanMazimizer-v0':
+        tc = 600
+        max_eva = 100
+    elif env_name == 'HeightMaximizer-v0':
+        tc = 500
+        max_eva = 150
+    elif env_name == 'Flipper-v0':
+        tc = 600
+        max_eva = 100
+    elif env_name == 'Jumper-v0':
+        tc = 500
+        max_eva = 100
+    elif env_name == 'Balancer-v0':
+        tc = 600
+        max_eva = 100
+    elif env_name == 'Balancer-v1':
+        tc = 600
+        max_eva = 150
+
+    return max_eva, tc

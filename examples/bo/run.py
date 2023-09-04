@@ -24,6 +24,7 @@ import evogym.envs
 from evogym import is_connected, has_actuator, get_full_connectivity
 from utils.algo_utils import TerminationCondition
 from ppo import run_ppo
+import csv
 
 def get_robot_from_genome(genome, config):
     '''
@@ -48,7 +49,9 @@ def eval_genome_cost(genome, config, genome_id, generation):
             structure=(robot, connectivity),
             termination_condition=TerminationCondition(config['train_iters']),
             saving_convention=(save_path_controller, genome_id),
+            override_env_name = config['env_name']
         )
+        print(genome, fitness)
         cost = -fitness
         return cost
 
@@ -61,6 +64,7 @@ def eval_genome_constraint(genomes, config):
     return np.array(all_violation)
 
 def run_bo(
+        env_name,
         experiment_name,
         structure_shape,
         pop_size,
@@ -74,27 +78,28 @@ def run_bo(
     try:
         os.makedirs(save_path)
     except:
-        print(f'THIS EXPERIMENT ({experiment_name}) ALREADY EXISTS')
-        print('Override? (y/n): ', end='')
-        ans = input()
-        if ans.lower() == 'y':
-            shutil.rmtree(save_path)
-            os.makedirs(save_path)
-        else:
-            return None, None
+        # print(f'THIS EXPERIMENT ({experiment_name}) ALREADY EXISTS')
+        # print('Override? (y/n): ', end='')
+        # ans = input()
+        # if ans.lower() == 'y':
+        #     shutil.rmtree(save_path)
+        #     os.makedirs(save_path)
+        # else:
+        #     return None, None
         print()
 
-    save_path_metadata = os.path.join(save_path, 'metadata.txt')
-    with open(save_path_metadata, 'w') as f:
-        f.write(f'POP_SIZE: {pop_size}\n' \
-            f'STRUCTURE_SHAPE: {structure_shape[0]} {structure_shape[1]}\n' \
-            f'MAX_EVALUATIONS: {max_evaluations}\n' \
-            f'TRAIN_ITERS: {train_iters}\n')
+    # save_path_metadata = os.path.join(save_path, 'metadata.txt')
+    # with open(save_path_metadata, 'w') as f:
+    #     f.write(f'POP_SIZE: {pop_size}\n' \
+    #         f'STRUCTURE_SHAPE: {structure_shape[0]} {structure_shape[1]}\n' \
+    #         f'MAX_EVALUATIONS: {max_evaluations}\n' \
+    #         f'TRAIN_ITERS: {train_iters}\n')
 
     config = {
         'structure_shape': structure_shape,
         'train_iters': train_iters,
         'save_path': save_path,
+        'env_name': env_name
     }
     
     def constraint_func(genome): 
@@ -109,15 +114,19 @@ def run_bo(
 
     def after_evaluate(generation, population_cost):
         save_path = config['save_path']
-        save_path_ranking = os.path.join(save_path, f'generation_{generation}', 'output.txt')
+        save_path_ranking = os.path.join(save_path, 'generations.csv')
         genome_fitness_list = -population_cost
         genome_id_list = np.argsort(population_cost)
         genome_fitness_list = np.array(genome_fitness_list)[genome_id_list]
-        with open(save_path_ranking, 'w') as f:
-            out = ''
+        # with open(save_path_ranking, 'w') as f:
+        #     out = ''
+        #     for genome_id, genome_fitness in zip(genome_id_list, genome_fitness_list):
+        #         out += f'{genome_id}\t\t{genome_fitness}\n'
+        #     f.write(out)
+        with open(save_path_ranking, 'a+', encoding='utf-8') as fp:
+            writer = csv.writer(fp)
             for genome_id, genome_fitness in zip(genome_id_list, genome_fitness_list):
-                out += f'{genome_id}\t\t{genome_fitness}\n'
-            f.write(out)
+                writer.writerow([genome_id, genome_fitness])
 
     space = Design_space(
         space=[{'name': 'x', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4), 'dimensionality': np.prod(structure_shape)}], 

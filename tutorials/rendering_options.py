@@ -2,6 +2,7 @@ from evogym import EvoWorld, EvoSim, EvoViewer, sample_robot
 import os
 import numpy as np
 import cv2
+import imageio
 
 ### CREATE A SIMPLE ENVIRONMENT ###
 
@@ -23,12 +24,23 @@ sim.reset()
 
 # set up viewer
 viewer = EvoViewer(sim)
-viewer.track_objects('robot', 'box')
+# viewer.track_objects('robot', 'box')
+viewer.track_objects('robot')
+img = viewer.render(
+            'screen',
+            verbose = True,
+            hide_background = True,
+            hide_grid = True,
+            hide_edges = False,
+            hide_voxels = False)
+imageio.save('1.png', img)
 
 ### SELECT A RENDERING OPTION ###
 
+"""
 options = ['to-debug-screen', 'to-numpy-array', 'special-options', 'very-fast']
-option = options[0]
+option = 'special-options'
+print(option)
 
 print(f'\nUsing rendering option {option}...\n')
 
@@ -36,7 +48,7 @@ print(f'\nUsing rendering option {option}...\n')
 if option == 'very-fast':
     viewer.set_target_rps(None)
 
-for i in range(1000):
+for i in range(10):
 
     sim.set_action(
         'robot', 
@@ -64,13 +76,16 @@ for i in range(1000):
         img = viewer.render(
             'screen', 
             verbose = True,
-            hide_background = False,
+            hide_background = True,
             hide_grid = True,
             hide_edges = False,
             hide_voxels = False)
+        imageio.save(str(i)+'.png', img)
+
 
     # rendering as fast as possible
     if option == 'very-fast':
         viewer.render('screen', verbose=True)
+"""
 
 cv2.destroyAllWindows()

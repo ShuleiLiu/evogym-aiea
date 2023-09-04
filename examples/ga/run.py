@@ -3,6 +3,7 @@ import numpy as np
 import shutil
 import random
 import math
+import csv
 
 import sys
 curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,8 +17,7 @@ from evogym import sample_robot, hashable
 import utils.mp_group as mp
 from utils.algo_utils import get_percent_survival_evals, mutate, TerminationCondition, Structure
 
-def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_iters, num_cores):
-    print()
+def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_iters, num_cores, env_name):
 
     ### STARTUP: MANAGE DIRECTORIES ###
     home_path = os.path.join(root_dir, "saved_data", experiment_name)
@@ -86,6 +86,8 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
     population_structure_hashes = {}
     num_evaluations = 0
     generation = 0
+
+    gen_optima = []
     
     #generate a population
     if not is_continuing: 
@@ -145,6 +147,9 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
 
         ### TRAIN GENERATION
 
+        tmp_inds = []
+        fits = []
+
         #better parallel
         group = mp.Group()
         for structure in structures:
@@ -161,18 +166,24 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
                 except:
                     print(f'Error coppying controller for {save_path_controller_part}.\n')
             else:        
-                ppo_args = ((structure.body, structure.connections), tc, (save_path_controller, structure.label))
+                ppo_args = ((structure.body, structure.connections), tc, (save_path_controller, structure.label), env_name)
                 group.add_job(run_ppo, ppo_args, callback=structure.set_reward)
+                tmp_inds.append(structure)
 
         group.run_jobs(num_cores)
-
-        #not parallel
-        #for structure in structures:
-        #    ppo.run_algo(structure=(structure.body, structure.connections), termination_condition=termination_condition, saving_convention=(save_path_controller, structure.label))
 
         ### COMPUTE FITNESS, SORT, AND SAVE ###
         for structure in structures:
             structure.compute_fitness()
+
+        for tmp_structure in tmp_inds:
+            fits.append(tmp_structure.compute_fitness())
+
+        optima_path = os.path.join(home_path, 'generations.csv')
+        with open(optima_path, 'a+', encoding='utf-8') as fp:
+            writer = csv.writer(fp)
+            for fi in range(len(fits)):
+                writer.writerow([fi, fits[fi]])
 
         structures = sorted(structures, key=lambda structure: structure.fitness, reverse=True)
 
@@ -183,16 +194,18 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
         out = ""
         for structure in structures:
             out += str(structure.label) + "\t\t" + str(structure.fitness) + "\n"
+        out += str(num_evaluations) + "\n"
         f.write(out)
         f.close()
+
 
          ### CHECK EARLY TERMINATION ###
         if num_evaluations == max_evaluations:
             print(f'Trained exactly {num_evaluations} robots')
-            return
+            break
 
-        print(f'FINISHED GENERATION {generation} - SEE TOP {round(percent_survival*100)} percent of DESIGNS:\n')
-        print(structures[:num_survivors])
+        # print(f'FINISHED GENERATION {generation} - SEE TOP {round(percent_survival*100)} percent of DESIGNS:\n')
+        # print(structures[:num_survivors])
 
         ### CROSSOVER AND MUTATION ###
         # save the survivors
@@ -206,6 +219,7 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
 
         # for randomly selected survivors, produce children (w mutations)
         num_children = 0
+
         while num_children < (pop_size - num_survivors) and num_evaluations < max_evaluations:
 
             parent_index = random.sample(range(num_survivors), 1)

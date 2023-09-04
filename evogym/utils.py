@@ -93,7 +93,7 @@ def sample_robot(
     Return a randomly sampled robot of a particular size.
 
     Args:
-        robot_shape (Tuple(int, int)): robot shape to sample `(h, w)`.
+        robot_shape (Tuple(int, int)): robot `shape` to sample `(h, w)`.
         pd (np.ndarray): `(5,)` array representing the probability of sampling each robot voxel (empty, rigid, soft, h_act, v_act). Defaults to a custom distribution. (default = None)
     
     Returns:

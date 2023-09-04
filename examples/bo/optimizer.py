@@ -188,9 +188,9 @@ class Optimization(ModularBayesianOptimization):
             # --- Update current evaluation time and function evaluations
             self.cum_time = time.time() - self.time_zero
 
-            if verbosity:
-                print("num acquisition: {}, time elapsed: {:.2f}s".format(
-                    self.num_acquisitions, self.cum_time))
+            # if verbosity:
+            #     print("num acquisition: {}, time elapsed: {:.2f}s".format(
+            #         self.num_acquisitions, self.cum_time))
 
         # --- Stop messages and execution time
         self._compute_results()
