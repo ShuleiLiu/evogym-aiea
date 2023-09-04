@@ -9,4 +9,6 @@ We use Evolution Gym (evogym) as the test suite to empirically validate the perf
 
 The code of AIEA is placed in examples/SAEA/.
 
-After installing evogym, run the file run_aiea.py in the examples folder.
+After installing evogym, run the file run_aiea.py in examples/.
+
+All the simulation animations are placed in animation/.
