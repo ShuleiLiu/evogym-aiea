@@ -42,4 +42,18 @@ The page's loading speed is slow, please be patient. Thank you!
 <td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/rfea_Pusher-v0_8.027.gif" />Reward:8.027</center></td>
 <td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/aiea_Pusher-v0_9.49.gif" />Reward:9.49</center></td>
 </tr>
+<tr>
+<td><center>BeamToppler-v0</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/ga_BeamToppler-v0_2.805.gif" />Reward:2.805</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/bo_BeamToppler-v0_7.531.gif" />Reward:7.531</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/rfea_BeamToppler-v0_3.515.gif" />Reward:3.515</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/aiea_BeamToppler-v0_8.87.gif" />Reward:8.87</center></td>
+</tr>
+<tr>
+<td><center>DownStepper-v0</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/ga_DownStepper-v0_4.898.gif" />Reward:4.898</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/bo_DownStepper-v0_5.682.gif" />Reward:5.682</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/rfea_DownStepper-v0_6.026.gif" />Reward:6.026</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/aiea_DownStepper-v0_9.031.gif" />Reward:9.031</center></td>
+</tr>
 </table>
