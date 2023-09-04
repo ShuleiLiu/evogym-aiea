@@ -15,6 +15,14 @@ The page's loading speed is slow, please be patient. Thank you!
 <td><center>RFEA</center></td>
 <td><center>AIEA</center></td>
 </tr>
+  <tr>
+<td><center>Climber-v2</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/ga_Climber-v2_0.518.gif" />Reward:0.518</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/bo_Climber-v2_0.403.gif" />Reward:0.403</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/rfea_Climber-v2_0.53.gif" />Reward:0.53</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/aiea_Climber-v2_0.612.gif" />Reward:0.612</center></td>
+</tr>
+<tr>
 <tr>
 <td><center>ObstacleTraverser-v1</center></td>
 <td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/ga_ObstacleTraverser-v1_1.659.gif" />Reward:1.659</center></td>
