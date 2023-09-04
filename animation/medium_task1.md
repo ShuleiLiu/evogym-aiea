@@ -50,4 +50,11 @@ The page's loading speed is slow, please be patient. Thank you!
 <td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/rfea_Climber-v1_0.467.gif" />Reward:0.467</center></td>
 <td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/aiea_Climber-v1_0.503.gif" />Reward:0.503</center></td>
 </tr>
+<tr>
+<td><center>UpStepper-v0</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/ga_UpStepper-v0_2.653.gif" />Reward:2.653</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/bo_UpStepper-v0_2.591.gif" />Reward:2.591</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/rfea_UpStepper-v0_3.281.gif" />Reward:3.281</center></td>
+<td><center><img src="https://github.com/shuleiLiu/AIEA-GIF/blob/main/gif/aiea_UpStepper-v0_4.527.gif" />Reward:4.527</center></td>
+</tr>
 </table>
